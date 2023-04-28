@@ -62,7 +62,38 @@ int main() {
 
     assert(c2.get_element("a").get_int() == 2);
 
-    std::cout << "Test methods - successfully!" << std::endl;
+
+    Context x3(c5);
+    assert(x3.get_type() == Context::Type::Scalar);
+    assert(x3.get_string() == "hello");
+
+    str = "Vasya";
+    Context context;
+    context.add_element("name", Context(str));
+    context.add_element("age", Context(18));
+    context.add_element("is_student", Context(true));
+    context.add_element("grades", Context({85, 90, 95}));
+
+    Context copy_context = context;
+
+    Context moved_context = std::move(context);
+
+    context.insert_element("email", Context("yandex.com"));
+    assert(context.has_element("email"));
+
+    context.remove_element("grades");
+    assert(!context.has_element("grades"));
+
+    Context c6;
+    c6.add_element(Context(1));
+    c6.add_element(Context(2));
+    c6.add_element(Context(3));
+    c6.move_element(0, 3);
+   /* for(auto i : c6.get_array()){
+        std::cout << i.get_int() << ' ';
+    }*/
+
+    std::cout<< std::endl << "Test methods - successfully!" << std::endl;
     std::cout << "Test Context class - successfully!" << std::endl;
     return 0;
 }

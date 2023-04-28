@@ -67,3 +67,51 @@ const Context &Context::get_element(const std::string &key) const {
     }
     return it->second;
 }
+
+Context &Context::operator=(const Context &other) = default;
+
+Context &Context::operator=(Context &&other) noexcept{
+    m_type = other.m_type;
+    m_scalar = std::move(other.m_scalar);
+    m_array = std::move(other.m_array);
+    m_map = std::move(other.m_map);
+    return *this;
+}
+
+void Context::insert_element(const std::string &key, const Context &context) {
+    if (m_type == Type::Array) {
+        m_array.emplace_back(context);
+    } else if (m_type == Type::Map) {
+        m_map.emplace(key, context);
+    }
+}
+
+void Context::remove_element(const std::string &key) {
+    if (m_type == Type::Map) {
+        m_map.erase(key);
+    }
+}
+
+void Context::remove_element( std::size_t index) {
+    if (m_type == Type::Array) {
+        m_array.erase(m_array.begin() + index);
+    }
+}
+
+void Context::move_element(const std::string &from_key, const std::string &to_key) {
+    if (m_type == Type::Map) {
+        m_map[to_key] = std::move(m_map[from_key]);
+        m_map.erase(from_key);
+    }
+}
+
+void Context::move_element(std::size_t from_index,  std::size_t to_index) {
+    if (m_type == Type::Array) {
+        if (from_index == to_index || from_index == to_index+1 || to_index > m_array.size() || to_index < 0 || from_index > m_array.size() || from_index < 0) {
+            throw std::out_of_range("Invalid from or to index");
+        }
+        m_array.insert(m_array.begin() + to_index, std::move(m_array[from_index]));
+        m_array.erase(m_array.begin() + from_index);
+
+    }
+}
